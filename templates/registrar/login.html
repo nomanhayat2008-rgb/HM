@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block header %} <title>Registrar_login</title>
+{% endblock %}
+
+{% block body %}
+    <section class="login">
+        <form action="#" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input class="login-input" type="password" name="password" placeholder="password"><br>
+            <input value="Login" class="login-input btm" type="submit">
+        </form>
+    </section>
+{% endblock %}

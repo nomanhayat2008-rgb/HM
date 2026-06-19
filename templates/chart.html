@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block header %} 
+<title>Patient Chart</title>
+<script src= '{{ url_for('static',filename='js/chart.umd.min.js') }}'></script>
+{% endblock %}
+{% block body %}
+
+<canvas id="myChart" class='glass' height="120"></canvas>
+
+<script src="{{ url_for('static', filename='chart.umd.min.js') }}"></script>
+
+<script>
+const labels = {{ labels | safe }};
+const counts = {{ counts | safe }};
+
+new Chart(document.getElementById('myChart'), {
+    type: 'line',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Patients Trend',
+            data: counts,
+            borderColor: 'red',
+            backgroundColor: 'rgba(255,0,0,0.1)',
+            tension: 0.4,        // 👈 نرمی خط (خیلی مهم)
+            fill: true,          // 👈 زیر خط رنگ می‌گیرد
+            pointRadius: 3,
+            pointHoverRadius: 6
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    display: false   // 👈 مثل چارت ترید
+                }
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: '#333'
+                }
+            }
+        }
+    }
+});
+</script>
+
+  
+{% endblock %}

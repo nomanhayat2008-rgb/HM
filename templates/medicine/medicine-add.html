@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block header %} <title>mine-page</title>
+{% endblock %}
+
+{% block body %}
+    {% for m in medicine %}
+        <img src="static/img/{{ m.id }}.jpg" alt="{{ m.m_name }}" class="img">
+        <h2>{{ m.m_name }}</h2>
+        <h1>{{ m.mc_name }}</h1>
+        <p class="td">{{ m.d_m }}</p>
+        <h1>{{ m.sell_p }}</h1>
+        <h1>{{ m.c_P }}</h1>
+        <h1>{{ m.quantity }}</h1>
+        <form action="add-to-card" method="get">
+            <input type="hidden" name="patient_id" value="{{ patient.id }}">
+            <input type="hidden" name="medicine_id" value="{{ medicine.id }}">
+            <button type="submit">add</button>
+        </form>
+    {% endfor %}
+{% endblock %}

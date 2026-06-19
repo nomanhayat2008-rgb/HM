@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block header %}
+
+{% endblock %}
+
+{% block body %}
+<section class="register glass">
+    <form action="#" method="post" enctype="multipart/form-data">
+        <div class="option">
+            <label>
+                <input class="radio" type="radio" name="db_type" value="1" checked>
+                داکتر هدایت الله
+            </label>
+
+            <label>
+                <input class="radio" type="radio" name="db_type" value="2">
+                داکتر عنایت الله
+            </label>
+
+            <label>
+                <input class="radio" type="radio" name="db_type" value="3">
+                بدون فیس
+            </label>
+        </div>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input class="r-input" type="text" name="username" placeholder="نام مریض"
+               value="{{ patient.username }}"><br>
+        <input class="r-input" type="text" name="fathername" placeholder=""
+               value="{{ patient.fathername }}"><br>
+
+        <input class="r-input" type="text" name="ePname" placeholder="نام مریض به انگلیسی" value="{{ patient.ePname }}"><br>
+        <input class="r-input" type="text" name="eFname" placeholder="نام پدر به انگلیسی"
+               value="{{ patient.eFname }}"><br>
+        <select class="r-input" name="gender" value="{{ patient.gender }}">
+            <option value="مذکر" {% if patient.gender==
+            "male" %}selected{% endif %}>مذکر</option>
+            <option value="مونث" {% if patient.gender==
+            "female" %}selected{% endif %}>مونث</option>
+        </select><br>
+        <input class="r-input" name="address" placeholder="قریه" value="{{ patient.address }}"><br>
+        <input class="r-input" type="number" name="number" placeholder="شمار تماس"
+               value="{{ patient.number if patient.number != None }}"><br>
+        <input class="r-input" type="number" name="loan" placeholder="قرض" value="{{ patient.loan }}"><br>
+        <input class="r-input" type="number" name="p_number" placeholder="شمار نخسه" value="{{ patient.p_number }}"><br>
+        <select class='r-input' name="u_s">
+            <option>50</option>
+            <option>200</option>
+        </select><br>
+        <select class='r-input' name="iv_c">
+            <option>50</option>
+            <option>70</option>
+        </select><br>
+        <label class="font-big">Neb:</label><input class="check-box" type="checkbox" name="neb"
+                                                   value=1 {{ 'checked' if patient.neb == 'yas' }}><br>
+        <label class="font-big">im:</label><input class="check-box" type="checkbox" name="im"
+                                                  value=1 {{ 'checked' if patient.im == 'yas' }}><br>
+        <label class="font-big">prescription:</label><input class="file" type="file" name="prescription"><br>
+        <input class="btm" type="submit">
+    </form>
+</section>
+{% endblock %}

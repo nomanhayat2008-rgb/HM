@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block header %}
+<title>manzor_p-page</title>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block body %}
+<button class="button">
+                <span class="button__text"><a href="/cart_p/show/{{patient_id}}">صفحه دوا</a></span>
+            </button>
+<section class="M">
+    {% for m in manzor_p %}
+        <section class="m_box glass">
+            <img src="{{ url_for('static', filename='mimg/' ~ m.id ~ '.jpg') }}"
+                 alt="{{ m.m_name }}" class="img">
+            <div>
+                <h5 >{{ m.m_name or '' }}</h5>
+                <h5>{{ m.mc_name or '' }}</h5>
+                <h5>{{ m.d_m }}</h5>
+                <h5>قیمت فروش: {{ m.sell_p }}</h5>
+                <h5>قیمت خرید: {{ m.c_p }}</h5>
+                <h5 id="manzor_p_qty_{{ m.id }}" data-qty="{{ m.quantity }}">
+                    موجودی: {{ m.quantity }}
+                </h5>
+                </div>
+                <button class="button" onclick="openModal({{ patient_id }}, {{ m.id }}, {{ m.sell_p }}, {{ m.quantity }})">Add</button>
+                
+        </section>
+    {% endfor %}
+</section>
+
+<div id="cartModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5)">
+    <div class="box-m glass" style="background:#fff; width:320px; margin:100px auto; padding:15px">
+        <form id="cartForm">
+            <input type="hidden" id="patient_id">
+            <input type="hidden" id="manzor_p_id">
+
+            <label>تعداد</label>
+            <input class="m-input" type="number" id="quantity" min="1" required>
+
+            <br><br>
+
+            <label>قیمت واحد (اختیاری)</label>
+            <input class="m-input" type="number" id="price" min="1">
+
+            <br><br>
+
+            <button class="ok" type="submit">ثبت</button>
+            <button class="c" type="button" onclick="closeModal()">لغو</button>
+        </form>
+    </div>
+</div>
+
+<script>
+const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+function openModal(patientId, manzor_pId, defaultPrice, maxQty) {
+    const modal = document.getElementById('cartModal');
+    modal.style.display = 'block';
+
+    document.getElementById('quantity').max = maxQty;
+    document.getElementById('quantity').value = 1;
+
+    document.getElementById('patient_id').value = patientId;
+    document.getElementById('manzor_p_id').value = manzor_pId;
+    document.getElementById('price').value = defaultPrice;
+}
+
+function closeModal() {
+    document.getElementById('cartModal').style.display = 'none';
+}
+
+document.getElementById('cartForm').addEventListener('submit', async function(e){
+    e.preventDefault();;
+
+    const quantityInput = document.getElementById('quantity');
+    const quantity = parseInt(quantityInput.value);
+    const maxQty = parseInt(quantityInput.max);
+
+    if(quantity < 1 || quantity > maxQty){
+        alert("تعداد نامعتبر است");
+        return;
+    }
+
+    const patientId = parseInt(document.getElementById('patient_id').value);
+    const manzor_pId = parseInt(document.getElementById('manzor_p_id').value);
+    const priceVal = document.getElementById('price').value;
+    const price = priceVal ? parseInt(priceVal) : null;
+
+    const data = {
+        patient_id: patientId,
+        manzor_p_id: manzor_pId,
+        quantity: quantity,
+        price: price
+    };
+
+    try {
+        const res = await fetch('/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(data)
+        });
+
+        if(!res.ok){
+            const text = await res.text();
+            console.error("Server error:", text);
+            alert("تعداد نامعتبر است");
+            return;
+        }
+
+        const result = await res.json();
+        alert(result.message);
+
+        if(result.status === 'success'){
+            // آپدیت موجودی روی صفحه بدون reload
+            const qtyElem = document.getElementById(`manzor_p_qty_${manzor_pId}`);
+            let currentQty = parseInt(qtyElem.dataset.qty);
+            currentQty -= quantity;
+            qtyElem.dataset.qty = currentQty;
+            qtyElem.innerText = 'موجودی: ' + currentQty;
+            closeModal();
+        }
+
+    } catch(err){
+        console.error(err);
+        alert("خطای شبکه یا سرور رخ داده است");
+    }
+});
+</script>
+{% endblock %}

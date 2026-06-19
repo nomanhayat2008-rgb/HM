@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block header %}
+{% endblock %}
+
+{% block body %}
+    <section class="s_box glass">
+        <form action="#" method="get">
+            <input type="search" name="search" class="search" value="{{ search if search !=None }}"><br>
+            <select name="search_by">
+                <option>Name</option>
+                <option>date</option>
+                <option>id</option>
+                <option>address</option>
+            </select>
+        </form>
+
+    </section>
+    <section class="last glass">
+        <table>
+            <tr>
+                <th class="font-big2 padding">آیدی</th>
+                <th class="font-big2 padding ">صفحه مریض</th>
+                <th class="font-big2 padding">اسم مریض</th>
+                <th class="font-big2 padding">نام پدر</th>
+                <th class="font-big2 padding">جنسیت</th>
+                <th class="font-big2 padding">مکان</th>
+                <th class="font-big2 padding">مقدار پول دریافت شده</th>
+                <th class="font-big2 padding">m_f</th>
+                <th class="font-big2 padding">تاریخ</th>
+                <th class="font-big2 padding">شماره تماس</th>
+                <th class="font-big2 padding">نمبر نسخه</th>
+                <th class="font-big2 padding">U\S</th>
+                <th class="font-big2 padding">Neb</th>
+                <th class="font-big2 padding">iv_c</th>
+                <th class="font-big2 padding">im</th>
+                <th class="font-big2 padding">ویرایش</th>
+            </tr>
+            {% for p in patients %}
+                <tr>
+                    <td class="td">{{ p.id }}</td>
+                    <td class="td btc glass"><a href="/patient{{ p.id }}">باز شود</a></td>
+                    <td class="td">{{ p.username }}</td>
+                    <td class="td">{{ p.fathername }}</td>
+                    <td class="td">{{ p.gender }}</td>
+                    <td class="td">{{ p.address }}</td>
+                    <td class="td">{{ p.fee }}</td>
+                    <td class="td">{{ p.m_f }}</td>
+                    <td class="td">{{ p.date }}</td>
+                    <td class="td">{{ p.number }}</td>
+                    <td class="td">{{ p.p_number }}</td>
+                    <td class="td">{{ 'yas' if p.u_s == 'yas' else 'no' }}</td>
+                    <td class="td">{{ 'yas' if p.neb == 'yas' else 'no' }}</td>
+                    <td class="td">{{ 'yas' if p.iv_c == 'yas' else 'no' }}</td>
+                    <td class="td">{{ 'yas' if p.im == 'yas' else 'no' }}</td>
+                    <td class="td btc glass"><a href="/doctor/page-edit/{{ p.id }}">ویرایش</a></td>
+                    <td class="td btc glass"><a class="delete-link" href="/doctor/page-delete/{{ p.id }}">خذف</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </section>
+{% endblock %}

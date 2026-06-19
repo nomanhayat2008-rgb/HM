@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<title>cart-show</title>
+<meta name="csrf-token" content="{{ csrf_token() }}">
+{% endblock %}
+
+{% block body %}
+
+<h3>سبد خرید {{ patient.username }}</h3>
+
+<table border="1" id="cartTable">
+    <thead>
+        <tr>
+            <th>دوا</th>
+            <th>قیمت واحد</th>
+            <th>تعداد</th>
+            <th>جمع</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for cart, med in carts %}
+    <tr id="cart_row_{{ cart.id }}"
+        data-price="{{ cart.unit_price }}">
+
+        <td>{{ med.m_name }}</td>
+
+        <td class="price">
+            {{ cart.unit_price }}
+        </td>
+
+        <td>
+            <input type="number"
+                   value="{{ cart.quantity }}"
+                   min="1"
+                   onchange="updateQty({{ cart.id }}, this)">
+        </td>
+
+        <td class="row-total">
+            {{ cart.price }}
+        </td>
+
+        <td>
+            <button onclick="removeItem({{ cart.id }})">
+                ❌
+            </button>
+        </td>
+
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h4>
+    مجموع کل:
+    <span id="grandTotal">{{ total_price }}</span>
+</h4>
+
+<button onclick="clearCart({{ patient.id }})">
+    حذف کامل سبد
+</button>
+
+<script>
+const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    .getAttribute('content');
+
+function calculateGrandTotal(){
+    let total = 0;
+    document.querySelectorAll(".row-total").forEach(cell => {
+        total += parseInt(cell.innerText) || 0;
+    });
+    document.getElementById("grandTotal").innerText = total;
+}
+
+async function updateQty(cartId, inputElement){
+
+    let qty = parseInt(inputElement.value);
+    if (qty < 1) return;
+
+    let row = document.getElementById(`cart_row_${cartId}`);
+    let price = parseInt(row.dataset.price);
+
+    let response = await fetch('/cart/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({
+            cart_id: cartId,
+            quantity: qty
+        })
+    });
+
+    let data = await response.json();
+
+    if(!response.ok){
+        alert(data.message || "خطا در بروزرسانی");
+        inputElement.value = inputElement.defaultValue;
+        return;
+    }
+
+    // آپدیت UI بعد از موفقیت سرور
+    let newTotal = price * qty;
+    row.querySelector(".row-total").innerText = newTotal;
+
+    inputElement.defaultValue = qty;
+
+    calculateGrandTotal();
+}
+
+async function removeItem(cartId){
+
+    let response = await fetch(`/cart/remove/${cartId}`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken }
+    });
+
+    if(!response.ok){
+        alert("حذف ناموفق");
+        return;
+    }
+
+    document.getElementById(`cart_row_${cartId}`).remove();
+    calculateGrandTotal();
+}
+
+async function clearCart(patientId){
+
+    if(!confirm("مطمئن هستی؟")) return;
+
+    let response = await fetch(`/cart/clear/${patientId}`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken }
+    });
+
+    if(!response.ok){
+        alert("خطا در حذف سبد");
+        return;
+    }
+
+    document.querySelector("#cartTable tbody").innerHTML = "";
+    calculateGrandTotal();
+}
+</script>
+
+{% endblock %}

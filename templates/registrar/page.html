@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% block header %}
+
+{% endblock %}
+
+{% block body %}
+<section class="register glass">
+    <form action="#" method="post">
+        <div class="option">
+            <label>
+                <input class="radio" type="radio" name="db_type" value="1" checked>
+                داکتر هدایت الله
+            </label>
+
+            <label>
+                <input class="radio" type="radio" name="db_type" value="2">
+                داکتر عنایت الله
+            </label>
+
+            <label>
+                <input class="radio" type="radio" name="db_type" value="3">
+                بدون فیس
+            </label>
+        </div>
+        <input class="r-input n_w" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input class="r-input n_w" type="text" name="username" placeholder="نام مریض"> <input class="r-input n_w" type="text"
+                                                                                          name="ePname"
+                                                                                          placeholder="نام مریض به انگلیسی"><br>
+        <input class="r-input n_w" type="text" name="fathername" placeholder="نام پدر"> <input class="r-input n_w" type="text"
+                                                                                           name="eFname"
+                                                                                           placeholder="نام پدر به انگلیسی"><br>
+        <select class="r-input" name="gender">
+            <option value="مذکر">مذکر</option>
+            <option value="مونث">مونث</option>
+        </select><br>
+        <input class="r-input" name="address" placeholder="قریه"><br>
+        <input class="r-input" type="number" name="number" placeholder="شمار تماس"><br>
+        <input class="r-input" type="number" name="p_number" placeholder="شمار نخسه"><br>
+        <select class='r-input' name="u_s">
+            <option></option>
+            <option>200</option>
+            <option>50</option>
+        </select><br>
+        <select class='r-input' name="iv_c">
+            <option></option>
+            <option>70</option>
+            <option>50</option>
+        </select><br>
+        <label class="font-big">Neb:</label><input class="check-box" type="checkbox" name="neb" value=1>
+        <label class="font-big">im:</label><input class="check-box" type="checkbox" name="im" value=1>
+        <input class="btm glass" type="submit">
+    </form>
+</section>
+
+<section class="s_box glass">
+    <div class='s-div'>
+        <form action="#" method="get">
+            <input type="search" name="search" class="search" value="{{ search if search !=None }}">
+            <select name="search_by" class="select">
+                <option>Name</option>
+                <option>date</option>
+                <option>id</option>
+                <option>address</option>
+            </select>
+        </form>
+        <label>total:</label>
+        <h1>{{ total_fee }}</h1>
+        <label>قیمت ثابت دوا:</label>
+        <h1>{{ profit }}</h1>
+        <label>سود خالص:</label>
+        <h1>{{ p_profit }}</h1>
+        <label>U\S:</label>
+        <h1>{{ u_s_total }}</h1>
+        <label>iv_c:</label>
+        <h1>{{ iv_c }}</h1>
+        <label>پول منظور:</label>
+        <h1>{{ p_fee }}</h1>
+        <label>تعداد مریض داکتر هدایت الله:</label>
+        <h1>{{ type_1 }}</h1>
+        <label>تعداد مریض داکتر عنایت الله:</label>
+        <h1>{{ type_2 }}</h1>
+        <label>بدون فیس:</label>
+        <h1>{{ type_3 }}</h1></div>
+    </select>
+
+</section>
+<section class="last glass">
+    <table>
+        <tr>
+            <th class="font-big2 padding">آیدی</th>
+            <th class="font-big2 padding"> مریض داکتر</th>
+            <th class="font-big2 padding">صفحه مریض</th>
+            <th class="font-big2 padding">اسم مریض</th>
+            <th class="font-big2 padding">نام پدر</th>
+            <th class="font-big2 padding">جنسیت</th>
+            <th class="font-big2 padding">مکان</th>
+            <th class="font-big2 padding">مقدار پول دریافت شده</th>
+            <th class="font-big2 padding">تاریخ</th>
+            <th class="font-big2 padding">شماره تماس</th>
+            <th class="font-big2 padding">نمبر نسخه</th>
+            <th class="font-big2 padding">U\S</th>
+            <th class="font-big2 padding">Neb</th>
+            <th class="font-big2 padding">iv_c</th>
+            <th class="font-big2 padding">im</th>
+            <th class="font-big2 padding">ویرایش</th>
+        </tr>
+        {% for p in patients %}
+        <tr>
+            <td class="td">{{ p.id }}</td>
+            <td class="td">
+                {% if p.db_type == '1' %}
+                داکتر هدایت الله
+                {% elif p.db_type == '2' %}
+                داکتر عنایت الله
+                {% elif p.db_type == '3' %}
+                بدون فیس
+                {% endif %}
+            </td>
+            <td class="td btc glass"><a href="/patient{{ p.id }}">باز شود</a></td>
+            <td class="td">{{ p.username if p.username != None}}</td>
+            <td class="td">{{ p.fathername if p.fathername != None}}</td>
+            <td class="td">{{ p.gender if p.gender != None}}</td>
+            <td class="td">{{ p.address if p.address != None}}</td>
+            <td class="td">{{ p.fee if p.fee != None}}</td>
+            <td class="td">{{ p.date if p.date != None }}</td>
+            <td class="td">{{ p.number if p.number != None }}</td>
+            <td class="td">{{ p.p_number if p.p_number != None}}</td>
+            <td class="td">{{ p.u_s if p.u_s != None }}</td>
+            <td class="td">{{ 'دارد' if p.neb == 'yas' else '' }}</td>
+            <td class="td">{{ p.iv_c if p.iv_c != None}}</td>
+            <td class="td">{{ 'دارد' if p.im == 'yas' else 'no' }}</td>
+            <td class="td btc glass"><a href="/registrar/page-edit/{{ p.id }}">ویرایش</a></td>
+            <td class="td btc glass"><a class="delete-link" href="/registrar/page-delete/{{ p.id }}">خذف</a></td>
+            <td class="td btc glass"><a href=/medicine/show/{{ p.id }}>اضافه کردن دوا</a></td>
+            <td class="td btc glass"><a href=/manzor_p/show/{{ p.id }}>اضافه کردن دوای منظور</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+{% endblock %}

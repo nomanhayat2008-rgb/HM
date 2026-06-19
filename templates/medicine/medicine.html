@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block header %}<title>صفحه دوا</title>{% endblock %}
+
+{% block body %}
+<section class="register glass">
+    <form id="medicineForm" action="{{ url_for('medicine.Medicine_page') }}" method="post"
+          enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input class="r-input" name="m_name" type="text" placeholder="نام دوا"><br>
+        <input class="r-input" name="mc_name" type="text" placeholder="نام کامپنی"><br>
+        <input class="r-input" name="sell_p" type="number" placeholder="قیمت فروش"><br>
+        <input class="r-input" name="c_p" type="number" placeholder="قیمت ثابت"><br>
+        <input class="r-input" name="q" type="number" placeholder="تعداد"><br>
+        <textarea class="t_r" name="d_m"></textarea><br>
+        <label class="font-big">عکس:</label>
+        <input class="file" type="file" name="file"><br>
+        <input class="btm glass" type="submit" value="اضافه کردن">
+    </form>
+</section>
+
+<section class="last glass">
+    <table>
+        <tr>
+            <th class="font-big2 padding">آیدی</th>
+            <th class="font-big2 padding">اسم دوا</th>
+            <th class="font-big2 padding">تاریخ اضافه شده</th>
+            <th class="font-big2 padding">اسم کمپنی دوا</th>
+            <th class="font-big2 padding">قیمت فروش</th>
+            <th class="font-big2 padding">قیمت عمده</th>
+            <th class="font-big2 padding">معلومات</th>
+            <th class="font-big2 padding">تعداد</th>
+        </tr>
+        {% for m in medicine %}
+        <tr>
+            <td class="td">{{ m.id }}</td>
+            <td class="td">{{ m.m_name }}</td>
+            <td class="td">{{ m.date }}</td>
+            <td class="td">{{ m.mc_name }}</td>
+            <td class="td">{{ m.sell_p }}</td>
+            <td class="td">{{ m.c_p }}</td>
+            <td class="td">{{ m.d_m }}</td>
+            <td class="td">{{ m.quantity }}</td>
+            <td class="td btc glass"><a href="/medicine/page-edit/{{m.id }}">ویرایش</a></td>
+            <td class="td btc glass"><a class="delete-link" href="/medicine/page-delete/{{m.id }}">حذف</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    // ===============================
+    // اضافه شدن دوا در دستگاه‌های دیگر
+    // ===============================
+    socket.on("new_medicine", function (data) {
+
+        const table = document.querySelector(".last table");
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td class="td">${data.id}</td>
+            <td class="td">${data.m_name}</td>
+            <td class="td">${new Date().toLocaleDateString()}</td>
+            <td class="td">${data.mc_name}</td>
+            <td class="td">${data.sell_p}</td>
+            <td class="td">${data.c_p}</td>
+            <td class="td">${data.d_m}</td>
+            <td class="td">${data.quantity}</td>
+            <td class="td btc glass">
+                <a href="/medicine/page-edit/${data.id}">ویرایش</a>
+            </td>
+            <td class="td btc glass">
+                <a href="/medicine/page-delete/${data.id}" class="delete-link">حذف</a>
+            </td>
+        `;
+
+        table.appendChild(row);
+    });
+
+    // ===============================
+    // ویرایش دوا
+    // ===============================
+    socket.on("update_medicine", function (data) {
+
+        const rows = document.querySelectorAll(".last table tr");
+
+        rows.forEach(function (tr) {
+
+            const firstCell = tr.querySelector("td");
+
+            if (firstCell && firstCell.textContent.trim() == data.id) {
+
+                tr.cells[1].textContent = data.m_name;
+                tr.cells[3].textContent = data.mc_name;
+                tr.cells[4].textContent = data.sell_p;
+                tr.cells[5].textContent = data.c_p;
+                tr.cells[6].textContent = data.d_m;
+                tr.cells[7].textContent = data.quantity;
+            }
+        });
+    });
+
+    // ===============================
+    // حذف دوا
+    // ===============================
+    socket.on("delete_medicine", function (data) {
+
+        const rows = document.querySelectorAll(".last table tr");
+
+        rows.forEach(function (tr) {
+
+            const firstCell = tr.querySelector("td");
+
+            if (firstCell && firstCell.textContent.trim() == data.id) {
+                tr.remove();
+            }
+        });
+    });
+
+    // ===============================
+    // تایید حذف
+    // ===============================
+    document.addEventListener("click", function (e) {
+
+        if (e.target.classList.contains("delete-link")) {
+
+            if (!confirm("آیا مطمئن هستید؟")) {
+                e.preventDefault();
+            }
+        }
+    });
+
+</script>
+{% endblock %}

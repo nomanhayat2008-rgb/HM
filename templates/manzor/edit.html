@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block header %}
+
+{% endblock %}
+
+{% block body %}
+    <section class="register glass">
+        <form action="#" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input class="r-input" type="text" name="m_name" placeholder="نام "
+                   value="{{ manzor_p.m_name }}"><br>
+            <input class="r-input" type="text" name="mc_name" placeholder="کمپنی"
+                   value="{{ manzor_p.mc_name }}"><br>
+            <input class="r-input" type="number" name="sell_p" placeholder="قیمت فروش" value="{{ manzor_p.sell_p }}"><br>
+            <input class="r-input" type="number" name="c_p" placeholder="قیمت کامپنی" value="{{ manzor_p.c_p }}"><br>
+            <textarea class="t_r" name="d_m" >{{ manzor_p.d_m }}</textarea>
+            <input class="r-input" type="number" name="q" placeholder="تعداد" value="{{ manzor_p.quantity }}"><br>
+             <label class="font-big">عکس:</label><input class="file" type="file" name="file"><br>
+            <input class="btm glass" type="submit">
+        </form>
+    </section>
+{% endblock %}

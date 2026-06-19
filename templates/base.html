@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/eggy.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/progressbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+
+    {% block header %}{% endblock %}
+</head>
+<body>
+<header id="mainHeader" class="fixed-header">
+    <div class='more'>
+        <button class="button" id="menuBtn">...</button>
+        <div id="headerContent">
+            <button class="button">
+                <span class="button__text">
+                    {% if session.get('doctor_login') %}
+                        <a href="/doctor/page">DP</a>
+                    {% else %}
+                        <a href="/doctor/login">DP</a>
+                    {% endif %}
+                </span>
+            </button>
+            <button class="button">
+                <span class="button__text">
+                    {% if session.get('registrar_login') %}
+                        <a href="/registrar/page">RP</a>
+                    {% else %}
+                        <a href="/registrar/login">RP</a>
+                    {% endif %}
+                </span>
+            </button>
+            <button class="button"><span class="button__text"><a href="/medicine/page">صفحه دوا</a></span></button>
+            <button class="button"><span class="button__text"><a href="/manzor_p/page">صفحه دوا منظور</a></span></button>
+            <button class="button"><span class="button__text"><a href="/chart">چارت</a></span></button>
+        </div>
+    </div>
+</header>
+
+{% set flash_messages = get_flashed_messages(with_categories=true) %}
+{% block body %}{% endblock %}
+
+<!-- Eggy -->
+<script type="module">
+    import { Eggy } from "{{ url_for('static', filename='js/eggy.js') }}";
+
+    {% if flash_messages %}
+        {% for category, message in flash_messages %}
+            Eggy({ title: "{{ category|capitalize }}", message: "{{ message }}", type: "{{ category }}" });
+        {% endfor %}
+    {% endif %}
+</script>
+
+<!-- SocketIO -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+if (!window.socket) {
+    window.socket = io();
+}
+</script>
+
+<script>
+const header = document.getElementById("mainHeader");
+const btn = document.getElementById("menuBtn");
+btn.onclick = () => {
+    header.classList.toggle("closed");
+    header.classList.toggle("left");
+};
+
+document.querySelectorAll('a.delete-link').forEach(link => {
+    link.addEventListener('click', function(e) {
+        if(!confirm('آیا مطمئن هستید که می‌خواهید این مورد را حذف کنید؟')) {
+            e.preventDefault();
+        }
+    });
+});
+</script>
+</body>
+</html>

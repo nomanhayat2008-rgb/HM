@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% block header %}
+    <meta charset="UTF-8">
+    <title>Word Like Editor</title>
+
+    <style>
+        body {
+            background: #ccc;
+            font-family: Tahoma;
+            padding: 20px;
+        }
+
+        .toolbar {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .toolbar button, .toolbar select, .toolbar input {
+            margin: 2px;
+        }
+
+        .page {
+            width: 794px;
+            min-height: 1123px;
+            background: white;
+            margin: 20px auto;
+            padding: 40px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, .3);
+        }
+
+        .editor {
+            min-height: 1040px;
+            outline: none;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .toolbar {
+                display: none;
+            }
+
+            .page {
+                box-shadow: none;
+                margin: 0;
+            }
+        }
+    </style>
+{% endblock %}
+{% block body %}
+    <div class="toolbar">
+        <button onclick="cmd('bold')">B</button>
+        <button onclick="cmd('italic')">I</button>
+        <button onclick="cmd('underline')">U</button>
+
+        <select onchange="cmd('fontName',this.value)">
+            <option value="Tahoma">Tahoma</option>
+            <option value="Arial">Arial</option>
+            <option value="Times New Roman">Times</option>
+        </select>
+
+        <select onchange="cmd('fontSize',this.value)">
+            <option value="3">Normal</option>
+            <option value="4">Large</option>
+            <option value="5">X-Large</option>
+        </select>
+
+        <input type="color" onchange="cmd('foreColor',this.value)">
+
+        <button onclick="cmd('justifyLeft')">Left</button>
+        <button onclick="cmd('justifyCenter')">Center</button>
+        <button onclick="cmd('justifyRight')">Right</button>
+
+        <button onclick="cmd('insertUnorderedList')">• List</button>
+        <button onclick="cmd('insertOrderedList')">1. List</button>
+
+        <button onclick="cmd('undo')">Undo</button>
+        <button onclick="cmd('redo')">Redo</button>
+
+        <button onclick="window.print()">Print</button>
+    </div>
+
+    <div class="page">
+        <div class="editor" contenteditable="true" dir="rtl">
+            اینجا مثل ورد تایپ کن...
+        </div>
+    </div>
+
+    <script>
+        function cmd(command, value = null) {
+            document.execCommand(command, false, value);
+        }
+    </script>
+{% endblock %}

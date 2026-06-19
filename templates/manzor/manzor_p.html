@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% block header %} <title>mine-page</title> {% endblock %}
+
+{% block body %}
+<section class="register glass">
+    <form id="manzorForm" enctype="multipart/form-data" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input class="r-input" name="m_name" type="text" placeholder="نام دوا"><br>
+        <input class="r-input" name="mc_name" type="text" placeholder="نام کامپنی"><br>
+        <input class="r-input" name="sell_p" type="number" placeholder="قیمت فروش"><br>
+        <input class="r-input" name="c_p" type="number" placeholder="قیمت ثابت"><br>
+        <input class="r-input" name="q" type="number" placeholder="تعداد"><br>
+        <textarea class="t_r" name="d_m"></textarea><br>
+        <label class="font-big">عکس:</label>
+        <input class="file" type="file" name="file"><br>
+        <input class="btm glass" type="submit" value="Add">
+    </form>
+</section>
+
+<section class="last glass">
+    <table id="manzorTable">
+        <tr>
+            <th class="font-big2 padding">آیدی</th>
+            <th class="font-big2 padding">اسم دوا</th>
+            <th class="font-big2 padding">تاریخ اضافه شده</th>
+            <th class="font-big2 padding">اسم کمپنی دوا</th>
+            <th class="font-big2 padding">قیمت فروش</th>
+            <th class="font-big2 padding">قیمت عمده</th>
+            <th class="font-big2 padding">معلومات</th>
+            <th class="font-big2 padding">تعداد</th>
+            <th class="font-big2 padding">ویرایش</th>
+            <th class="font-big2 padding">حذف</th>
+        </tr>
+        {% for m in manzor_p %}
+        <tr id="manzor-{{ m.id }}">
+            <td class="td">{{ m.id }}</td>
+            <td class="td">{{ m.m_name }}</td>
+            <td class="td">{{ m.date }}</td>
+            <td class="td">{{ m.mc_name }}</td>
+            <td class="td">{{ m.sell_p }}</td>
+            <td class="td">{{ m.c_p }}</td>
+            <td class="td">{{ m.d_m }}</td>
+            <td class="td">{{ m.quantity }}</td>
+            <td class="td"><a href="/manzor_p/page-edit/{{ m.id }}">ویرایش</a></td>
+            <td class="td"><a class="delete-link" href="/manzor_p/page-delete/{{m.id }}">حذف</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</section>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+    const socket = io();
+
+    // اضافه شدن منظور توسط دیگر کلاینت‌ها
+    socket.on("manzor_added", data => {
+        const table = document.getElementById("manzorTable");
+        const row = document.createElement("tr");
+        row.id = `manzor-${data.id}`;
+        row.innerHTML = `
+            <td>${data.id}</td>
+            <td>${data.m_name}</td>
+            <td>${data.date}</td>
+            <td>${data.mc_name}</td>
+            <td>${data.sell_p}</td>
+            <td>${data.c_p}</td>
+            <td>${data.d_m}</td>
+            <td>${data.quantity}</td>
+            <td><a href="/manzor_p/page-edit/${data.id}">ویرایش</a></td>
+            <td><a href="/manzor_p/page-delete/${data.id}" class="delete-link">حذف</a></td>
+        `;
+        table.appendChild(row);
+    });
+
+    // حذف منظور توسط دیگر کلاینت‌ها
+    socket.on("manzor_deleted", id => {
+        const row = document.getElementById(`manzor-${id}`);
+        if (row) row.remove();
+    });
+
+    // تایید حذف در خود دستگاه
+    document.addEventListener("click", function(e) {
+        if (e.target.classList.contains("delete-link")) {
+            if (!confirm("آیا مطمئن هستید؟")) e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}
