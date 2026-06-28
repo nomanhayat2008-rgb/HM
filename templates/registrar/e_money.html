@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block header %} <title>add_epended_money</title>
+{% endblock %}
+
+{% block body %}
+    <section class="register glass">
+    <form action="#" method="post">
+        <input class="r-input n_w" type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input class="r-input n_w" type="number" name="e_m" placeholder="مقدار مصرف"> 
+        <input class="r-input n_w" type="text" name="e_r" placeholder="دلیل مصرف"> 
+        <input class="btm glass" type="submit" value="add">
+    </form>
+</section>
+<section class="s_box glass">
+    <div class='s-div'>
+        <form action="#" method="get">
+            <input type="search"
+                name="search"
+                class="search"
+                list="suggestions"
+                placeholder="جستجو...">
+           <select name="search_by" class="select">
+                <option value="name">Name</option>
+                <option value="date">Date</option>
+            </select>
+        </form>
+        <label>مقدار کل مصرف:</label>
+        <h1>{{ e_total }}</h1>
+    </div>
+    </section>
+<section class="s_box glass">
+    <table>
+        <tr>
+            <th class="font-big2 padding">مقدار مصرف</th>
+            <th class="font-big2 padding">دلیل مصرف</th>
+        </tr>
+         {% for e in e_moneys %}
+            <tr>
+                <td class="td">{{ e.e_m }}</td>
+                <td class="td">{{ e.e_r }}</td>
+                <td class="td">{{ e.date }}</td>
+                <td class="td btc glass"><a class="delete-link" href="/registrar/e_money-delete/{{ e.id }}">خذف</a></td>
+            </tr>
+        {% endfor %}
+           </table>
+</section>
+{% endblock %}

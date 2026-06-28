@@ -13,6 +13,7 @@ from model.manzor_p import Manzor_p
 from model.medicine import Medicine
 from model.patient import Patient
 from model.cart import Cart
+from model.e_money import E_Money
 from config import parse_int
 
 app = Blueprint("registrar", __name__)
@@ -67,7 +68,8 @@ def Registrar_page():
     type_3 = 0
     profit = 0
     p_profit = 0
-
+    e =0
+    e_total=0
     if search:
         if search_by == 'Name':
             patients = patients.filter(Patient.username.like(f'%{search}%'))
@@ -77,9 +79,21 @@ def Registrar_page():
             patients = patients.filter(Patient.id.like(f'%{search}%'))
         elif search_by == 'address':
             patients = patients.filter(Patient.address.like(f'%{search}%'))
+        elif search_by == 'type':
+            if search == "D.Hedayatullah":
+                search = 1
+            elif search == "D.Enayt":
+                search = 2
+            elif search == "Nofee":
+                search = 3
+            patients = patients.filter(Patient.db_type.like(f'%{search}%'))
 
         a = db.session.query(func.sum(Patient.fee)) \
                 .filter(Patient.date.like(f'%{search}%') if search_by == 'date' else True) \
+                .scalar() or 0
+        
+        e = db.session.query(func.sum(E_Money.e_m)) \
+                .filter(E_Money.date.like(f'%{search}%') if search_by == 'date' else True) \
                 .scalar() or 0
         profit = db.session.query(func.sum(Patient.profit)) \
                      .filter(Patient.date.like(f'%{search}%') if search_by == 'date' else True) \
@@ -108,6 +122,7 @@ def Registrar_page():
         ).scalar()
 
         total_fee = a + b
+        e_total =total_fee -e
         p_profit = a - profit
         u_s_total = u
     patients = patients.order_by(Patient.id.desc()).all()
@@ -124,7 +139,9 @@ def Registrar_page():
             type_2=type_2,
             type_3=type_3,
             profit=profit,
-            p_profit=p_profit
+            p_profit=p_profit,
+            e=e,
+            e_total=e_total
         )
 
     # -------- POST (Add new patient) --------
@@ -418,3 +435,52 @@ def medicine_show(patient_id):
         medicines=medicines,
         patient_id=patient.id
     )
+
+#=================================
+#==add_expend_money
+#=================================
+@app.route('/registrar/e_money', methods=['GET', 'POST'])
+def e_money():
+    search = request.args.get('search')
+    search_by = request.args.get('search_by')
+    e=0
+    e_moneys = E_Money.query
+
+    if search:
+        if search_by == "name":
+            condition = E_Money.e_r.like(f"%{search}%")
+        else:
+            condition = E_Money.date.like(f"%{search}%")
+
+        e_moneys = e_moneys.filter(condition)
+
+        e = db.session.query(func.sum(E_Money.e_m)).filter(condition).scalar() or 0
+    else:
+        e = db.session.query(func.sum(E_Money.e_m)).scalar() or 0
+
+    e_moneys = e_moneys.order_by(E_Money.id.desc()).all()
+    
+    if request.method == "GET":
+        return render_template(
+            'registrar/e_money.html',e_moneys=e_moneys,e_total=e)
+    e_m =parse_int(request.form.get('e_m'))
+    e_r =parse_int(request.form.get('e_r'))
+    if not e_m or not e_r:
+        flash("دلیل مصرف و مقدار مصرف زروری است", 'error')
+        return redirect(request.url)
+    e =E_Money (e_m= e_m,
+                e_r=e_r)
+    db.session.add(e)
+    db.session.commit()
+
+    flash('معلومات موفقانه ثبت شد!', 'success')
+    socketio.emit("reload_page", {"reload": True})
+    return redirect(url_for("registrar.e_money"))
+@app.route('/registrar/e_money-delete/<int:id>', methods=['GET'])
+def e_money_delete(id):
+    e_money = E_Money.query.get_or_404(id)
+
+    db.session.delete(e_money)
+    db.session.commit()
+    flash('معلومات حذف شد', 'success')
+    return redirect(url_for('registrar.e_money'))

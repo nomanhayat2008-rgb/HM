@@ -142,7 +142,7 @@ body > section > a:hover {
     justify-content: center;
     align-items: center;
     margin: 10px auto auto;
-    width: 1350px;
+    width: inherit;
     padding: 15px;
     font-size: 17px;
     background: linear-gradient(315deg, rgba(162, 222, 255, 0.97), rgba(169, 218, 250, 0.97));
@@ -480,5 +480,5 @@ a {
     justify-content: space-evenly;
 }
 .n_w {
-    width: 242px !important;
+    width: fit-content !important;
 }

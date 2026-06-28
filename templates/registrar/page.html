@@ -38,8 +38,9 @@
         <input class="r-input" type="number" name="p_number" placeholder="شمار نخسه"><br>
         <select class='r-input' name="u_s">
             <option></option>
-            <option>200</option>
             <option>50</option>
+            <option>100</option>
+            <option>200</option>
         </select><br>
         <select class='r-input' name="iv_c">
             <option></option>
@@ -55,16 +56,31 @@
 <section class="s_box glass">
     <div class='s-div'>
         <form action="#" method="get">
-            <input type="search" name="search" class="search" value="{{ search if search !=None }}">
+            <input type="search"
+                name="search"
+                class="search"
+                list="suggestions"
+                value="{% if search == 3 %}Nofee{% elif search == 2 %}D.Enayt{% elif search == 1 %}D.Hedayatullah{% else %}{{ search or '' }}{% endif %}"
+                placeholder="جستجو...">
+            <datalist id="suggestions">
+                <option value="Nofee">
+                <option value="D.Enayt">
+                <option value="D.Hedayatullah">
+            </datalist>
             <select name="search_by" class="select">
                 <option>Name</option>
                 <option>date</option>
                 <option>id</option>
                 <option>address</option>
+                <option>type</option>
             </select>
         </form>
         <label>total:</label>
         <h1>{{ total_fee }}</h1>
+        <label>مقدار باقیمانده:</label>
+        <h1>{{ e_total }}</h1>
+        <label>مقدار مصرف:</label>
+        <h1>{{ e }}</h1>
         <label>قیمت ثابت دوا:</label>
         <h1>{{ profit }}</h1>
         <label>سود خالص:</label>
